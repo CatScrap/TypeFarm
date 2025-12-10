@@ -478,21 +478,25 @@
         }
 
         // ==================== COMMANDS ====================
+        let lastCommandSuccess = true;
+
         function handleCommand(input) {
             const raw = input.trim();
             const parts = raw.toLowerCase().split(/\s+/);
             const cmd = parts[0];
 
-            // Validate command
+            // Validate root command
             const validRoots = ['help', '?', 'shop', 'farm', 'inventory', 'inv', 'i', 'stats', 'clear', 'save'];
-            const isValid = validRoots.includes(cmd);
+            const isValidRoot = validRoots.includes(cmd);
 
-            logCommand(raw, isValid);
-
-            if (!isValid) {
+            if (!isValidRoot) {
+                logCommand(raw, false);
                 action(`❓ Unknown: "${cmd}"`, 'error');
                 return;
             }
+
+            // Execute command and track success
+            lastCommandSuccess = true;
 
             switch (cmd) {
                 case 'help':
@@ -523,6 +527,13 @@
                     action('💾 Saved!', 'success');
                     break;
             }
+
+            // Log command with actual success status
+            logCommand(raw, lastCommandSuccess);
+        }
+
+        function commandFailed() {
+            lastCommandSuccess = false;
         }
 
         function handleShopCommand(parts) {
@@ -539,11 +550,13 @@
 
                 if (!item) {
                     action(`❌ Unknown item: "${itemName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (state.coins < item.price) {
                     action(`❌ Need ${item.price}¢, have ${state.coins}¢`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -561,6 +574,7 @@
 
                 if (!state.inventory[itemName] || state.inventory[itemName] < qty) {
                     action(`❌ Don't have ${qty}x ${itemName}`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -572,6 +586,7 @@
 
                 if (!sellPrice) {
                     action(`❌ Can't sell "${itemName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -584,6 +599,7 @@
             }
             else {
                 action(`❌ Unknown shop command: "${shopAction}"`, 'error');
+                commandFailed();
             }
         }
 
@@ -602,11 +618,13 @@
 
                 if (plotIdx === -1) {
                     action(`❌ Invalid plot: "${plotName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (state.farm[plotIdx]) {
                     action(`❌ Plot ${plotName} is occupied!`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -614,11 +632,13 @@
 
                 if (!state.inventory[fullSeedName] || state.inventory[fullSeedName] < 1) {
                     action(`❌ No ${fullSeedName} in inventory`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (!state.crops[fullSeedName]) {
                     action(`❌ Unknown seed: "${fullSeedName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -641,11 +661,13 @@
 
                 if (plotIdx === -1) {
                     action(`❌ Invalid plot: "${plotName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (!state.farm[plotIdx]) {
                     action(`❌ Nothing in ${plotName}`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -665,16 +687,19 @@
 
                 if (plotIdx === -1) {
                     action(`❌ Invalid plot: "${plotName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (!state.farm[plotIdx]) {
                     action(`❌ Nothing in ${plotName}`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (!state.inventory['fertilizer'] || state.inventory['fertilizer'] < 1) {
                     action(`❌ No fertilizer!`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -694,11 +719,13 @@
 
                 if (plotIdx === -1) {
                     action(`❌ Invalid plot: "${plotName}"`, 'error');
+                    commandFailed();
                     return;
                 }
 
                 if (!state.farm[plotIdx]) {
                     action(`❌ Nothing in ${plotName}`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -708,6 +735,7 @@
                 if (elapsed < plot.growTime) {
                     const remaining = Math.ceil(plot.growTime - elapsed);
                     action(`❌ Not ready! ${remaining}s left`, 'error');
+                    commandFailed();
                     return;
                 }
 
@@ -722,6 +750,7 @@
             }
             else {
                 action(`❌ Unknown farm command: "${farmAction}"`, 'error');
+                commandFailed();
             }
         }
 
