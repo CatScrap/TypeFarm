@@ -200,6 +200,7 @@
         .green { color: var(--accent-green); }
         .red { color: var(--accent-red); }
         .pink { color: var(--accent-pink); }
+        .cyan { color: var(--accent-cyan); }
     </style>
 </head>
 <body>
@@ -245,8 +246,18 @@
             coins: 50,
             day: 1,
             season: 'Spring',
+            location: 'home',
+            vehicle: 'bike',
             inventory: {},
             farm: Array(9).fill(null),
+            // Travel state
+            traveling: false,
+            travelDest: null,
+            travelProgress: 0,
+            travelTarget: 100,
+            travelText: '',
+            travelIndex: 0,
+            travelErrors: 0,
             shopItems: {
                 'carrot seeds': { price: 10, desc: 'Grows 30s, sells 25' },
                 'tomato seeds': { price: 20, desc: 'Grows 45s, sells 50' },
@@ -254,7 +265,21 @@
                 'pumpkin seeds': { price: 50, desc: 'Grows 90s, sells 120' },
                 'golden seeds': { price: 150, desc: 'Grows 120s, sells 400' },
                 'fertilizer': { price: 25, desc: 'Halves grow time' },
-                'watering can': { price: 100, desc: 'Auto-water crops' }
+                'watering can': { price: 100, desc: 'Auto-water crops' },
+                'scooter': { price: 200, desc: 'Faster than bike, less typing' },
+                'car': { price: 500, desc: 'Much faster, minimal typing' },
+                'truck': { price: 1000, desc: 'Instant travel!' }
+            },
+            vehicles: {
+                'bike': { emoji: '🚲', speed: 5, owned: true },
+                'scooter': { emoji: '🛵', speed: 15, owned: false },
+                'car': { emoji: '🚗', speed: 30, owned: false },
+                'truck': { emoji: '🚚', speed: 100, owned: false }
+            },
+            locations: {
+                'home': { emoji: '🏠', name: 'Home' },
+                'shop': { emoji: '🏪', name: 'Shop' },
+                'farm': { emoji: '🌾', name: 'Farm' }
             },
             crops: {
                 'carrot seeds': { growTime: 30, emoji: '🥕', sellPrice: 25, stages: ['🌱', '🌿', '🥕'] },
@@ -262,10 +287,50 @@
                 'corn seeds': { growTime: 60, emoji: '🌽', sellPrice: 80, stages: ['🌱', '🌾', '🌽'] },
                 'pumpkin seeds': { growTime: 90, emoji: '🎃', sellPrice: 120, stages: ['🌱', '🌿', '🎃'] },
                 'golden seeds': { growTime: 120, emoji: '✨', sellPrice: 400, stages: ['🌱', '💫', '✨'] }
-            }
+            },
+            travelPhrases: [
+                "pedal faster down the road",
+                "watch out for that pothole",
+                "the wind feels nice today",
+                "almost there keep going",
+                "beautiful day for a ride",
+                "the farm is just ahead",
+                "steady pace wins the race",
+                "enjoy the countryside view"
+            ]
         };
 
         const plotNames = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3'];
+
+        // Travel minigame state
+        const travelState = {
+            active: false,
+            destination: null,
+            vehicleType: 'bike',
+            position: 2, // 0-4 lanes (left to right)
+            distance: 0,
+            totalDistance: 100,
+            score: 0,
+            health: 100, // for bike
+            fuel: 100, // for car/truck
+            obstacles: [],
+            currentDirection: null,
+            typedText: '',
+            correctChars: 0,
+            totalChars: 0,
+            errors: 0,
+            startTime: null,
+            lastKeyTime: null,
+            idleTime: 0,
+            wordsTyped: 0,
+            perfectWords: 0,
+            gameLoop: null,
+            obstacleSpeed: 1,
+            spawnRate: 60, // frames between spawns
+            frameCount: 0
+        };
+
+        const directions = ['left', 'right', 'up', 'dodge', 'jump', 'duck', 'swerve', 'brake'];
 
         // All possible commands for prediction
         const allCommands = [
@@ -290,7 +355,13 @@
             'inventory', 'inv',
             'stats',
             'clear',
-            'save'
+            'save',
+            'bike go home', 'bike go shop', 'bike go farm', 'bike status',
+            'scooter go home', 'scooter go shop', 'scooter go farm', 'scooter status',
+            'car go home', 'car go shop', 'car go farm', 'car status',
+            'truck go home', 'truck go shop', 'truck go farm', 'truck status',
+            'go home', 'go shop', 'go farm',
+            'location', 'where'
         ];
 
         // ==================== UTILITIES ====================
@@ -376,6 +447,13 @@
   clear             Clear logs
   save              Save game
 
+<span class="highlight">TRAVEL</span>
+  location / where  Show current location
+  [vehicle] go [dest]  Travel somewhere
+  [vehicle] status  Check vehicle health/fuel
+  <span class="dim">Vehicles: bike, scooter, car, truck</span>
+  <span class="dim">Destinations: home, shop, farm</span>
+
 <span class="highlight">SHOP</span>
   shop              View shop
   shop buy [item]   Purchase item
@@ -392,7 +470,7 @@
   inventory / inv   View items
 
 <span class="dim">Plots: A1-A3, B1-B3, C1-C3</span>
-<span class="dim">Example: farm plant carrot A1</span>`);
+<span class="dim">Example: bike go shop</span>`);
         }
 
         function showShop() {
@@ -409,8 +487,19 @@
             }
             html += `\n<span class="highlight">TOOLS</span>\n`;
             for (const [name, item] of Object.entries(state.shopItems)) {
-                if (!name.includes('seeds')) {
+                if (!name.includes('seeds') && !['scooter', 'car', 'truck'].includes(name)) {
                     html += `  ${name.padEnd(15)} <span class="highlight">${String(item.price).padStart(3)}</span>¢  <span class="dim">${item.desc}</span>\n`;
+                }
+            }
+            html += `\n<span class="highlight">VEHICLES</span>\n`;
+            for (const [name, item] of Object.entries(state.shopItems)) {
+                if (['scooter', 'car', 'truck'].includes(name)) {
+                    const owned = state.vehicles[name]?.owned;
+                    if (owned) {
+                        html += `  ${name.padEnd(15)} <span class="green">OWNED</span>\n`;
+                    } else {
+                        html += `  ${name.padEnd(15)} <span class="highlight">${String(item.price).padStart(3)}</span>¢  <span class="dim">${item.desc}</span>\n`;
+                    }
                 }
             }
             html += `\n<span class="dim">Your coins:</span> <span class="highlight">${state.coins}</span>`;
@@ -486,12 +575,20 @@
             const cmd = parts[0];
 
             // Validate root command
-            const validRoots = ['help', '?', 'shop', 'farm', 'inventory', 'inv', 'i', 'stats', 'clear', 'save'];
+            const validRoots = ['help', '?', 'shop', 'farm', 'inventory', 'inv', 'i', 'stats', 'clear', 'save',
+                               'bike', 'scooter', 'car', 'truck', 'go', 'location', 'where'];
             const isValidRoot = validRoots.includes(cmd);
 
             if (!isValidRoot) {
                 logCommand(raw, false);
                 action(`❓ Unknown: "${cmd}"`, 'error');
+                return;
+            }
+
+            // Check if traveling - only allow travel input
+            if (travelState.active) {
+                handleTravelInput(raw);
+                logCommand(raw, lastCommandSuccess);
                 return;
             }
 
@@ -526,6 +623,20 @@
                     save();
                     action('💾 Saved!', 'success');
                     break;
+                case 'bike':
+                case 'scooter':
+                case 'car':
+                case 'truck':
+                    handleVehicleCommand(parts, cmd);
+                    break;
+                case 'go':
+                    // Use current vehicle
+                    handleVehicleCommand(['go', ...parts.slice(1)], state.vehicle);
+                    break;
+                case 'location':
+                case 'where':
+                    showLocation();
+                    break;
             }
 
             // Log command with actual success status
@@ -551,6 +662,32 @@
                 if (!item) {
                     action(`❌ Unknown item: "${itemName}"`, 'error');
                     commandFailed();
+                    return;
+                }
+
+                // Check if it's a vehicle
+                if (['scooter', 'car', 'truck'].includes(itemName)) {
+                    if (state.vehicles[itemName]?.owned) {
+                        action(`❌ You already own a ${itemName}!`, 'error');
+                        commandFailed();
+                        return;
+                    }
+
+                    if (state.coins < item.price) {
+                        action(`❌ Need ${item.price}¢, have ${state.coins}¢`, 'error');
+                        commandFailed();
+                        return;
+                    }
+
+                    state.coins -= item.price;
+                    state.vehicles[itemName].owned = true;
+                    state.vehicles[itemName].health = 100;
+                    state.vehicles[itemName].fuel = 100;
+                    action(`✅ Bought ${itemName} for ${item.price}¢!`, 'success');
+                    action(`🚗 Use: ${itemName} go [destination]`, 'system');
+                    updateStats();
+                    save();
+                    showShop();
                     return;
                 }
 
@@ -752,6 +889,410 @@
                 action(`❌ Unknown farm command: "${farmAction}"`, 'error');
                 commandFailed();
             }
+        }
+
+        // ==================== VEHICLE & TRAVEL ====================
+        function showLocation() {
+            const loc = state.locations[state.location];
+            const veh = state.vehicles[state.vehicle];
+            display(`<span class="section-title">═══ 📍 LOCATION ═══</span>
+
+  Current: ${loc.emoji} ${loc.name}
+  Vehicle: ${veh.emoji} ${state.vehicle}
+
+<span class="highlight">AVAILABLE DESTINATIONS</span>
+${Object.entries(state.locations)
+    .filter(([k]) => k !== state.location)
+    .map(([k, v]) => `  ${v.emoji} ${v.name.padEnd(8)} - ${state.vehicle} go ${k}`)
+    .join('\n')}
+
+<span class="highlight">VEHICLES</span>
+${Object.entries(state.vehicles)
+    .map(([k, v]) => `  ${v.emoji} ${k.padEnd(8)} ${v.owned ? '<span class="green">Owned</span>' : '<span class="dim">Buy at shop</span>'}`)
+    .join('\n')}
+
+<span class="dim">Travel by typing: [vehicle] go [destination]</span>`);
+        }
+
+        function handleVehicleCommand(parts, vehicleType) {
+            const vehicle = state.vehicles[vehicleType];
+
+            if (!vehicle) {
+                action(`❌ Unknown vehicle: "${vehicleType}"`, 'error');
+                commandFailed();
+                return;
+            }
+
+            if (!vehicle.owned) {
+                action(`❌ You don't own a ${vehicleType}! Buy it from shop.`, 'error');
+                commandFailed();
+                return;
+            }
+
+            const subCmd = parts[1];
+
+            if (!subCmd || subCmd === 'status') {
+                showVehicleStatus(vehicleType);
+                return;
+            }
+
+            if (subCmd === 'go') {
+                const dest = parts[2];
+                if (!dest || !state.locations[dest]) {
+                    action(`❌ Unknown destination: "${dest || ''}"`, 'error');
+                    action(`📍 Try: home, shop, or farm`, 'system');
+                    commandFailed();
+                    return;
+                }
+
+                if (dest === state.location) {
+                    action(`📍 You're already at ${state.locations[dest].name}!`, 'warning');
+                    commandFailed();
+                    return;
+                }
+
+                startTravel(vehicleType, dest);
+            } else {
+                action(`❌ Unknown ${vehicleType} command: "${subCmd}"`, 'error');
+                commandFailed();
+            }
+        }
+
+        function showVehicleStatus(vehicleType) {
+            const v = state.vehicles[vehicleType];
+            const isCurrent = state.vehicle === vehicleType;
+
+            let statusBar = '';
+            if (vehicleType === 'bike' || vehicleType === 'scooter') {
+                const health = v.health || 100;
+                const bars = Math.floor(health / 10);
+                statusBar = `Health: [${'█'.repeat(bars)}${'░'.repeat(10-bars)}] ${health}%`;
+            } else {
+                const fuel = v.fuel || 100;
+                const bars = Math.floor(fuel / 10);
+                statusBar = `Fuel:   [${'█'.repeat(bars)}${'░'.repeat(10-bars)}] ${fuel}%`;
+            }
+
+            display(`<span class="section-title">═══ ${v.emoji} ${vehicleType.toUpperCase()} STATUS ═══</span>
+
+  ${statusBar}
+  Speed:  ${v.speed} (less typing needed)
+  ${isCurrent ? '<span class="green">✓ Currently selected</span>' : '<span class="dim">Type: ' + vehicleType + ' go [dest] to use</span>'}
+
+<span class="dim">Travel to repair/refuel at home</span>`);
+        }
+
+        function startTravel(vehicleType, destination) {
+            const vehicle = state.vehicles[vehicleType];
+
+            // Check health/fuel
+            if ((vehicleType === 'bike' || vehicleType === 'scooter') && (vehicle.health || 100) <= 0) {
+                action(`❌ Your ${vehicleType} is broken! Go home to repair.`, 'error');
+                commandFailed();
+                return;
+            }
+            if ((vehicleType === 'car' || vehicleType === 'truck') && (vehicle.fuel || 100) <= 0) {
+                action(`❌ Your ${vehicleType} is out of fuel! Go home to refuel.`, 'error');
+                commandFailed();
+                return;
+            }
+
+            // Initialize travel state
+            travelState.active = true;
+            travelState.destination = destination;
+            travelState.vehicleType = vehicleType;
+            travelState.position = 2;
+            travelState.distance = 0;
+            travelState.totalDistance = Math.max(20, 100 - vehicle.speed);
+            travelState.score = 0;
+            travelState.health = vehicle.health || 100;
+            travelState.fuel = vehicle.fuel || 100;
+            travelState.obstacles = [];
+            travelState.currentDirection = getRandomDirection();
+            travelState.typedText = '';
+            travelState.correctChars = 0;
+            travelState.totalChars = 0;
+            travelState.errors = 0;
+            travelState.startTime = Date.now();
+            travelState.lastKeyTime = Date.now();
+            travelState.idleTime = 0;
+            travelState.wordsTyped = 0;
+            travelState.perfectWords = 0;
+            travelState.frameCount = 0;
+            travelState.obstacleSpeed = 1 + (vehicle.speed / 50);
+            travelState.spawnRate = Math.max(30, 80 - vehicle.speed);
+
+            state.vehicle = vehicleType;
+
+            action(`${vehicle.emoji} Starting trip to ${state.locations[destination].name}!`, 'success');
+            action(`⌨️ Type directions to dodge obstacles!`, 'system');
+
+            // Start game loop
+            travelState.gameLoop = setInterval(updateTravel, 50);
+            renderTravel();
+        }
+
+        function getRandomDirection() {
+            return directions[Math.floor(Math.random() * directions.length)];
+        }
+
+        function handleTravelInput(input) {
+            const typed = input.toLowerCase().trim();
+            const target = travelState.currentDirection;
+
+            travelState.lastKeyTime = Date.now();
+
+            if (typed === target) {
+                // Correct word!
+                travelState.wordsTyped++;
+                travelState.perfectWords++;
+                travelState.correctChars += target.length;
+                travelState.totalChars += target.length;
+                travelState.score += 10;
+                travelState.distance += 5;
+
+                // Move position based on direction
+                if (typed === 'left' || typed === 'swerve') {
+                    travelState.position = Math.max(0, travelState.position - 1);
+                } else if (typed === 'right') {
+                    travelState.position = Math.min(4, travelState.position + 1);
+                }
+
+                // Clear obstacles in current lane
+                travelState.obstacles = travelState.obstacles.filter(o => o.lane !== travelState.position || o.y < 8);
+
+                travelState.currentDirection = getRandomDirection();
+                travelState.typedText = '';
+                action(`✅ ${typed}! +10pts`, 'success');
+                lastCommandSuccess = true;
+            } else {
+                // Wrong word
+                travelState.errors++;
+                travelState.totalChars += typed.length;
+                travelState.wordsTyped++;
+
+                const vehicle = state.vehicles[travelState.vehicleType];
+                if (travelState.vehicleType === 'bike' || travelState.vehicleType === 'scooter') {
+                    travelState.health -= 10;
+                    vehicle.health = travelState.health;
+                    action(`❌ Wrong! -10 health (${travelState.health}%)`, 'error');
+                } else {
+                    travelState.fuel -= 5;
+                    vehicle.fuel = travelState.fuel;
+                    action(`❌ Wrong! -5 fuel (${travelState.fuel}%)`, 'error');
+                }
+
+                lastCommandSuccess = false;
+                travelState.currentDirection = getRandomDirection();
+                travelState.typedText = '';
+            }
+
+            renderTravel();
+        }
+
+        function updateTravel() {
+            travelState.frameCount++;
+
+            // Update idle time
+            const idleMs = Date.now() - travelState.lastKeyTime;
+            travelState.idleTime += 50;
+
+            // Auto-progress distance slowly
+            travelState.distance += 0.1;
+
+            // Spawn obstacles
+            if (travelState.frameCount % travelState.spawnRate === 0) {
+                const lane = Math.floor(Math.random() * 5);
+                const obstacles = ['🚧', '🪨', '🌲', '🚗', '🐄', '🦆'];
+                travelState.obstacles.push({
+                    lane: lane,
+                    y: 0,
+                    emoji: obstacles[Math.floor(Math.random() * obstacles.length)]
+                });
+            }
+
+            // Move obstacles down
+            travelState.obstacles.forEach(o => {
+                o.y += travelState.obstacleSpeed * 0.1;
+            });
+
+            // Check collisions
+            travelState.obstacles = travelState.obstacles.filter(o => {
+                if (o.y >= 8 && o.y <= 10 && o.lane === travelState.position) {
+                    // Collision!
+                    const vehicle = state.vehicles[travelState.vehicleType];
+                    if (travelState.vehicleType === 'bike' || travelState.vehicleType === 'scooter') {
+                        travelState.health -= 15;
+                        vehicle.health = travelState.health;
+                    } else {
+                        travelState.fuel -= 10;
+                        vehicle.fuel = travelState.fuel;
+                    }
+                    travelState.score -= 5;
+                    action(`💥 Hit ${o.emoji}!`, 'warning');
+                    return false;
+                }
+                return o.y < 12;
+            });
+
+            // Check win/lose conditions
+            if (travelState.distance >= travelState.totalDistance) {
+                endTravel(true);
+                return;
+            }
+
+            if ((travelState.vehicleType === 'bike' || travelState.vehicleType === 'scooter') && travelState.health <= 0) {
+                endTravel(false, 'Your ' + travelState.vehicleType + ' broke down!');
+                return;
+            }
+
+            if ((travelState.vehicleType === 'car' || travelState.vehicleType === 'truck') && travelState.fuel <= 0) {
+                endTravel(false, 'Your ' + travelState.vehicleType + ' ran out of fuel!');
+                return;
+            }
+
+            renderTravel();
+        }
+
+        function endTravel(success, reason = '') {
+            clearInterval(travelState.gameLoop);
+            travelState.active = false;
+
+            const elapsedSec = (Date.now() - travelState.startTime) / 1000;
+            const wpm = travelState.wordsTyped > 0 ? Math.round((travelState.wordsTyped / elapsedSec) * 60) : 0;
+            const accuracy = travelState.totalChars > 0 ? Math.round((travelState.correctChars / travelState.totalChars) * 100) : 0;
+
+            // Save vehicle state
+            const vehicle = state.vehicles[travelState.vehicleType];
+            if (travelState.vehicleType === 'bike' || travelState.vehicleType === 'scooter') {
+                vehicle.health = Math.max(0, travelState.health);
+            } else {
+                vehicle.fuel = Math.max(0, travelState.fuel);
+            }
+
+            if (success) {
+                state.location = travelState.destination;
+                const bonus = Math.floor(travelState.score / 5);
+                addCoins(bonus);
+                action(`🎉 Arrived at ${state.locations[travelState.destination].name}!`, 'success');
+                action(`💰 Bonus: ${bonus}¢ for your performance!`, 'success');
+
+                // Repair/refuel at home
+                if (travelState.destination === 'home') {
+                    for (const [vName, vData] of Object.entries(state.vehicles)) {
+                        if (vData.owned) {
+                            if (vName === 'bike' || vName === 'scooter') {
+                                if ((vData.health || 100) < 100) {
+                                    vData.health = 100;
+                                    action(`🔧 ${vData.emoji} ${vName} repaired!`, 'success');
+                                }
+                            } else {
+                                if ((vData.fuel || 100) < 100) {
+                                    vData.fuel = 100;
+                                    action(`⛽ ${vData.emoji} ${vName} refueled!`, 'success');
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                action(`💔 ${reason}`, 'error');
+                action(`📍 Stranded! Walking back home...`, 'warning');
+                state.location = 'home';
+                // Repair/refuel at home after walking back
+                for (const [vName, vData] of Object.entries(state.vehicles)) {
+                    if (vData.owned) {
+                        if (vName === 'bike' || vName === 'scooter') {
+                            vData.health = 100;
+                        } else {
+                            vData.fuel = 100;
+                        }
+                    }
+                }
+                action(`🔧 All vehicles repaired at home`, 'system');
+            }
+
+            save();
+
+            // Show results
+            display(`<span class="section-title">═══ 🏁 TRIP ${success ? 'COMPLETE' : 'FAILED'} ═══</span>
+
+${success ? `<span class="green">✓ Arrived at ${state.locations[travelState.destination].name}!</span>` : `<span class="red">✗ ${reason}</span>`}
+
+<span class="highlight">TRIP STATS</span>
+  Score:      <span class="highlight">${travelState.score}</span> pts
+  Distance:   ${Math.floor(travelState.distance)}/${travelState.totalDistance}
+
+<span class="highlight">TYPING STATS</span>
+  WPM:        <span class="cyan">${wpm}</span>
+  Accuracy:   <span class="${accuracy >= 80 ? 'green' : accuracy >= 50 ? 'highlight' : 'red'}">${accuracy}%</span>
+  Words:      ${travelState.wordsTyped}
+  Perfect:    ${travelState.perfectWords}
+  Errors:     <span class="red">${travelState.errors}</span>
+  Idle Time:  ${(travelState.idleTime / 1000).toFixed(1)}s
+
+<span class="dim">Type 'location' to see your current position</span>`);
+        }
+
+        function renderTravel() {
+            const vehicle = state.vehicles[travelState.vehicleType];
+            const vEmoji = vehicle.emoji;
+
+            // Calculate stats
+            const elapsedSec = Math.max(0.1, (Date.now() - travelState.startTime) / 1000);
+            const wpm = Math.round((travelState.wordsTyped / elapsedSec) * 60);
+            const accuracy = travelState.totalChars > 0 ? Math.round((travelState.correctChars / travelState.totalChars) * 100) : 100;
+            const idleSec = ((Date.now() - travelState.lastKeyTime) / 1000).toFixed(1);
+
+            // Progress bar
+            const progress = Math.min(100, (travelState.distance / travelState.totalDistance) * 100);
+            const progBars = Math.floor(progress / 5);
+            const progressBar = `[${'█'.repeat(progBars)}${'░'.repeat(20-progBars)}] ${Math.floor(progress)}%`;
+
+            // Health/Fuel bar
+            let statusBar = '';
+            if (travelState.vehicleType === 'bike' || travelState.vehicleType === 'scooter') {
+                const h = Math.max(0, travelState.health);
+                const hBars = Math.floor(h / 10);
+                statusBar = `❤️ [${'<span class="red">█</span>'.repeat(hBars)}${'░'.repeat(10-hBars)}] ${h}%`;
+            } else {
+                const f = Math.max(0, travelState.fuel);
+                const fBars = Math.floor(f / 10);
+                statusBar = `⛽ [${'<span class="highlight">█</span>'.repeat(fBars)}${'░'.repeat(10-fBars)}] ${f}%`;
+            }
+
+            // Build road with obstacles
+            let road = '';
+            for (let y = 0; y < 10; y++) {
+                let row = '  │';
+                for (let lane = 0; lane < 5; lane++) {
+                    const obstacle = travelState.obstacles.find(o => o.lane === lane && Math.floor(o.y) === y);
+                    if (y === 8 && lane === travelState.position) {
+                        row += ` ${vEmoji} `;
+                    } else if (obstacle) {
+                        row += ` ${obstacle.emoji} `;
+                    } else {
+                        row += ' · ';
+                    }
+                }
+                row += '│';
+                road += row + '\n';
+            }
+
+            display(`<span class="section-title">═══ ${vEmoji} TRAVELING TO ${state.locations[travelState.destination].emoji} ${state.locations[travelState.destination].name.toUpperCase()} ═══</span>
+
+${progressBar}   Score: <span class="highlight">${travelState.score}</span>
+${statusBar}
+
+<span class="dim">  ╔═══════════════════╗</span>
+${road}<span class="dim">  ╚═══════════════════╝</span>
+
+<span class="highlight">TYPE:</span> <span class="green">${travelState.currentDirection}</span>
+
+<span class="dim">─────────── LIVE STATS ───────────</span>
+  WPM: <span class="cyan">${wpm}</span>  │  Accuracy: <span class="${accuracy >= 80 ? 'green' : 'red'}">${accuracy}%</span>  │  Idle: <span class="${parseFloat(idleSec) > 2 ? 'red' : 'dim'}">${idleSec}s</span>
+  Perfect: <span class="green">${travelState.perfectWords}</span>  │  Errors: <span class="red">${travelState.errors}</span>  │  Words: ${travelState.wordsTyped}
+<span class="dim">──────────────────────────────────</span>`);
         }
 
         // ==================== INIT ====================
