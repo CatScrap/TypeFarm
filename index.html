@@ -17,6 +17,7 @@
             --accent-green: #00ff88;
             --accent-yellow: #ffd700;
             --accent-red: #ff4757;
+            --accent-pink: #ff9ff3;
             --border: #2a2a3a;
         }
 
@@ -30,18 +31,17 @@
             overflow: hidden;
         }
 
-        /* Header */
         .header {
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 0.8rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -49,42 +49,27 @@
 
         .stats {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
+            font-size: 0.9rem;
         }
 
-        .stat {
-            text-align: center;
-        }
+        .stat span { color: var(--accent-yellow); }
 
-        .stat-value {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: var(--accent-yellow);
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-        }
-
-        /* Main Content */
         .main-content {
             display: flex;
             flex: 1;
             overflow: hidden;
         }
 
-        /* Terminal Log */
         .terminal-log {
-            width: 33%;
+            width: 35%;
             background: var(--bg-panel);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
         }
 
-        .terminal-log-header {
+        .panel-header {
             padding: 0.5rem 1rem;
             background: var(--bg-input);
             border-bottom: 1px solid var(--border);
@@ -95,181 +80,38 @@
         .terminal-log-content {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
-            font-size: 0.85rem;
-            line-height: 1.6;
+            padding: 0.8rem;
+            font-size: 0.8rem;
+            line-height: 1.5;
         }
 
-        .log-entry {
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
+        .log-entry { margin-bottom: 0.3rem; }
         .log-system { color: var(--accent-cyan); }
         .log-success { color: var(--accent-green); }
         .log-warning { color: var(--accent-yellow); }
         .log-error { color: var(--accent-red); }
-        .log-npc { color: #ff9ff3; }
+        .log-npc { color: var(--accent-pink); }
 
-        /* Game Frame */
         .game-frame {
-            width: 67%;
+            width: 65%;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .game-frame-header {
-            padding: 0.5rem 1rem;
-            background: var(--bg-input);
-            border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
-            color: var(--accent-green);
-            display: flex;
-            gap: 1rem;
-        }
-
-        .tab {
-            cursor: pointer;
-            padding: 0.3rem 0.8rem;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-
-        .tab:hover { background: var(--border); }
-        .tab.active { background: var(--accent-green); color: var(--bg-dark); }
-
         .game-content {
             flex: 1;
             overflow-y: auto;
-            padding: 1.5rem;
-        }
-
-        /* Typing Area */
-        .typing-section {
-            margin-bottom: 2rem;
-        }
-
-        .typing-prompt {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            min-height: 100px;
-        }
-
-        .typing-prompt .correct { color: var(--accent-green); }
-        .typing-prompt .incorrect { color: var(--accent-red); background: rgba(255,71,87,0.2); }
-        .typing-prompt .cursor { border-left: 2px solid var(--accent-cyan); animation: blink 1s infinite; }
-        .typing-prompt .pending { color: var(--text-dim); }
-
-        @keyframes blink { 50% { border-color: transparent; } }
-
-        .typing-input {
-            width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
             padding: 1rem;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-primary);
-            outline: none;
-        }
-
-        .typing-input:focus { border-color: var(--accent-cyan); }
-
-        .typing-stats {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
             font-size: 0.9rem;
-            color: var(--text-dim);
+            line-height: 1.6;
+            white-space: pre-wrap;
         }
 
-        /* Shop */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .shop-item {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .shop-item:hover {
-            border-color: var(--accent-cyan);
-            transform: translateY(-2px);
-        }
-
-        .shop-item-name { font-weight: bold; color: var(--accent-cyan); }
-        .shop-item-price { color: var(--accent-yellow); margin: 0.5rem 0; }
-        .shop-item-desc { font-size: 0.8rem; color: var(--text-dim); }
-
-        /* Farm */
-        .farm-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            max-width: 500px;
-        }
-
-        .farm-plot {
-            aspect-ratio: 1;
-            background: #3d2817;
-            border: 2px solid #5a3d21;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 2rem;
-        }
-
-        .farm-plot:hover { border-color: var(--accent-green); }
-        .farm-plot.empty { background: #2a1f0f; }
-        .farm-plot.growing { background: #3d4a17; }
-        .farm-plot.ready { background: #4a6a17; border-color: var(--accent-yellow); }
-
-        .plot-status {
-            font-size: 0.6rem;
-            color: var(--text-dim);
-            margin-top: 0.3rem;
-        }
-
-        /* Inventory */
-        .inventory-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .inventory-item {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        /* Terminal Input */
         .terminal-input-bar {
             background: var(--bg-panel);
             border-top: 1px solid var(--border);
-            padding: 1rem 2rem;
+            padding: 0.8rem 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -287,171 +129,296 @@
             outline: none;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-        /* NPC */
-        .npc-dialogue {
+        .typing-area {
             background: var(--bg-input);
-            border-left: 3px solid #ff9ff3;
+            border: 1px solid var(--border);
             padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            line-height: 1.8;
         }
 
-        .npc-name { color: #ff9ff3; font-weight: bold; margin-bottom: 0.5rem; }
+        .correct { color: var(--accent-green); }
+        .incorrect { color: var(--accent-red); background: rgba(255,71,87,0.2); }
+        .cursor { border-left: 2px solid var(--accent-cyan); animation: blink 1s infinite; }
+        .pending { color: var(--text-dim); }
+
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        .section-title { color: var(--accent-cyan); margin-bottom: 0.5rem; }
+        .highlight { color: var(--accent-yellow); }
+        .dim { color: var(--text-dim); }
+        .green { color: var(--accent-green); }
+        .red { color: var(--accent-red); }
+        .pink { color: var(--accent-pink); }
     </style>
 </head>
 <body>
     <header class="header">
         <h1>🌱 TypeFarm</h1>
         <div class="stats">
-            <div class="stat">
-                <div class="stat-value" id="coins">0</div>
-                <div class="stat-label">Coins</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="wpm">0</div>
-                <div class="stat-label">WPM</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="accuracy">100%</div>
-                <div class="stat-label">Accuracy</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value" id="level">1</div>
-                <div class="stat-label">Level</div>
-            </div>
+            <div>Coins: <span id="coins">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+            <div>WPM: <span id="wpm">0</span></div>
+            <div>Accuracy: <span id="accuracy">100%</span></div>
         </div>
     </header>
 
     <main class="main-content">
         <aside class="terminal-log">
-            <div class="terminal-log-header">📟 Terminal Log</div>
+            <div class="panel-header">📟 Terminal Log</div>
             <div class="terminal-log-content" id="log"></div>
         </aside>
 
         <section class="game-frame">
-            <div class="game-frame-header">
-                <span class="tab active" data-view="typing">⌨️ Typing</span>
-                <span class="tab" data-view="shop">🏪 Shop</span>
-                <span class="tab" data-view="farm">🌾 Farm</span>
-                <span class="tab" data-view="inventory">🎒 Inventory</span>
-            </div>
-            <div class="game-content" id="game-content"></div>
+            <div class="panel-header">📺 Display</div>
+            <div class="game-content" id="display"></div>
         </section>
     </main>
 
     <footer class="terminal-input-bar">
         <span class="terminal-prompt">$</span>
-        <input type="text" class="terminal-input" id="command-input" placeholder="Type a command... (try 'help')" autocomplete="off">
+        <input type="text" class="terminal-input" id="input" placeholder="Type 'help' for commands..." autocomplete="off" autofocus>
     </footer>
 
     <script>
         // ==================== GAME STATE ====================
         const state = {
-            coins: 0,
+            coins: 50,
             level: 1,
             xp: 0,
             totalKeystrokes: 0,
             correctKeystrokes: 0,
             startTime: null,
-            inventory: {
-                'Carrot Seeds': 3,
-                'Tomato Seeds': 2
-            },
-            farm: [
-                null, null, null, null,
-                null, null, null, null
-            ],
-            shopItems: [
-                { id: 'carrot-seeds', name: 'Carrot Seeds', price: 10, desc: 'Grows in 30 seconds' },
-                { id: 'tomato-seeds', name: 'Tomato Seeds', price: 25, desc: 'Grows in 60 seconds' },
-                { id: 'corn-seeds', name: 'Corn Seeds', price: 50, desc: 'Grows in 90 seconds' },
-                { id: 'golden-seeds', name: 'Golden Seeds', price: 200, desc: 'Rare! Grows in 120 seconds' },
-                { id: 'fertilizer', name: 'Fertilizer', price: 30, desc: 'Speeds up growth by 50%' },
-                { id: 'water-can', name: 'Golden Watering Can', price: 100, desc: 'Auto-waters your crops' }
-            ],
-            currentView: 'typing',
+            mode: 'normal', // 'normal' or 'typing'
             typingText: '',
-            typingIndex: 0
+            typingIndex: 0,
+            inventory: {},
+            farm: Array(9).fill(null), // 3x3 grid: A1-A3, B1-B3, C1-C3
+            shopItems: {
+                'carrot seeds': { price: 10, desc: 'Grows in 30s, sells for 25' },
+                'tomato seeds': { price: 20, desc: 'Grows in 45s, sells for 50' },
+                'corn seeds': { price: 35, desc: 'Grows in 60s, sells for 80' },
+                'pumpkin seeds': { price: 50, desc: 'Grows in 90s, sells for 120' },
+                'golden seeds': { price: 150, desc: 'Grows in 120s, sells for 400' },
+                'fertilizer': { price: 25, desc: 'Halves remaining grow time' },
+                'watering can': { price: 100, desc: 'Auto-waters all crops' }
+            },
+            crops: {
+                'carrot seeds': { growTime: 30, emoji: '🥕', sellPrice: 25, stages: ['🌱', '🌿', '🥕'] },
+                'tomato seeds': { growTime: 45, emoji: '🍅', sellPrice: 50, stages: ['🌱', '🌿', '🍅'] },
+                'corn seeds': { growTime: 60, emoji: '🌽', sellPrice: 80, stages: ['🌱', '🌾', '🌽'] },
+                'pumpkin seeds': { growTime: 90, emoji: '🎃', sellPrice: 120, stages: ['🌱', '🌿', '🎃'] },
+                'golden seeds': { growTime: 120, emoji: '✨', sellPrice: 400, stages: ['🌱', '💫', '✨'] }
+            },
+            prompts: [
+                "The quick brown fox jumps over the lazy dog.",
+                "Pack my box with five dozen liquor jugs.",
+                "Farmers plant seeds in fertile soil every spring.",
+                "The harvest moon rises over golden wheat fields.",
+                "Water your crops daily for the best results.",
+                "Typing faster earns more coins for your farm.",
+                "Buy seeds from the shop and watch them grow.",
+                "A good farmer knows patience is a virtue.",
+                "The scarecrow guards the field from hungry crows.",
+                "Fresh vegetables taste better from your own garden."
+            ]
         };
 
-        const prompts = [
-            "The quick brown fox jumps over the lazy dog.",
-            "Pack my box with five dozen liquor jugs.",
-            "How vexingly quick daft zebras jump!",
-            "The farmer planted seeds in the fertile soil.",
-            "Vegetables grow best with sunshine and water.",
-            "Typing fast earns more coins for the farm.",
-            "Buy seeds from the shop to grow your crops.",
-            "Harvest your plants when they are ready.",
-            "The seasons change and so do the crops.",
-            "A good farmer types with speed and precision."
-        ];
+        const plotNames = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3'];
 
         // ==================== UTILITIES ====================
-        function saveGame() {
-            localStorage.setItem('typefarm-save', JSON.stringify(state));
-        }
+        function save() { localStorage.setItem('typefarm', JSON.stringify(state)); }
 
-        function loadGame() {
-            const saved = localStorage.getItem('typefarm-save');
+        function load() {
+            const saved = localStorage.getItem('typefarm');
             if (saved) {
                 const data = JSON.parse(saved);
                 Object.assign(state, data);
             }
         }
 
-        function log(message, type = 'system') {
-            const logEl = document.getElementById('log');
+        function log(msg, type = 'system') {
+            const el = document.getElementById('log');
             const entry = document.createElement('div');
             entry.className = `log-entry log-${type}`;
-            entry.innerHTML = `<span style="color:#666">[${new Date().toLocaleTimeString()}]</span> ${message}`;
-            logEl.appendChild(entry);
-            logEl.scrollTop = logEl.scrollHeight;
+            entry.textContent = msg;
+            el.appendChild(entry);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function display(content) {
+            document.getElementById('display').innerHTML = content;
         }
 
         function updateStats() {
             document.getElementById('coins').textContent = state.coins;
             document.getElementById('level').textContent = state.level;
-
             if (state.totalKeystrokes > 0) {
                 const acc = Math.round((state.correctKeystrokes / state.totalKeystrokes) * 100);
                 document.getElementById('accuracy').textContent = acc + '%';
             }
-
             if (state.startTime && state.correctKeystrokes > 0) {
-                const minutes = (Date.now() - state.startTime) / 60000;
-                const wpm = Math.round((state.correctKeystrokes / 5) / minutes);
-                document.getElementById('wpm').textContent = Math.min(wpm, 999);
+                const mins = (Date.now() - state.startTime) / 60000;
+                document.getElementById('wpm').textContent = Math.round((state.correctKeystrokes / 5) / mins);
             }
         }
 
-        function addCoins(amount) {
-            state.coins += amount;
-            state.xp += amount;
+        function addCoins(n) {
+            state.coins += n;
+            state.xp += n;
             if (state.xp >= state.level * 100) {
                 state.level++;
-                log(`🎉 Level up! You are now level ${state.level}!`, 'success');
+                log(`🎉 LEVEL UP! Now level ${state.level}!`, 'success');
             }
             updateStats();
-            saveGame();
+            save();
         }
 
-        // ==================== VIEWS ====================
-        function renderTyping() {
-            if (!state.typingText) {
-                state.typingText = prompts[Math.floor(Math.random() * prompts.length)];
-                state.typingIndex = 0;
+        function getPlotIndex(name) {
+            return plotNames.indexOf(name.toUpperCase());
+        }
+
+        // ==================== DISPLAY FUNCTIONS ====================
+        function showHelp() {
+            display(`<span class="section-title">═══ COMMANDS ═══</span>
+
+<span class="highlight">GENERAL</span>
+  help              - Show this help
+  stats             - Show your stats
+  clear             - Clear terminal log
+
+<span class="highlight">TYPING</span>
+  type              - Start typing challenge
+  (just type when in typing mode, 'exit' to leave)
+
+<span class="highlight">SHOP</span>
+  shop              - View shop items
+  shop buy [item]   - Buy an item
+  shop sell [item] [qty] - Sell harvested crops
+
+<span class="highlight">FARM</span>
+  farm              - View your farm
+  farm plant [seed] [plot] - Plant seeds (e.g., farm plant carrot A1)
+  farm water [plot] - Water a plot
+  farm fertilize [plot] - Use fertilizer
+  farm harvest [plot] - Harvest ready crops
+
+<span class="highlight">INVENTORY</span>
+  inventory         - View your items
+  inv               - Shortcut for inventory
+
+<span class="dim">Plots are named A1-A3, B1-B3, C1-C3</span>`);
+        }
+
+        function showShop() {
+            let html = `<span class="section-title">═══ 🏪 FARMER JOE'S SHOP ═══</span>
+
+<span class="pink">"Welcome! What can I get ya today?"</span>
+
+<span class="highlight">SEEDS</span>
+`;
+            for (const [name, item] of Object.entries(state.shopItems)) {
+                if (name.includes('seeds')) {
+                    html += `  ${name.padEnd(16)} - <span class="highlight">${item.price}</span> coins  <span class="dim">${item.desc}</span>\n`;
+                }
+            }
+            html += `\n<span class="highlight">TOOLS</span>\n`;
+            for (const [name, item] of Object.entries(state.shopItems)) {
+                if (!name.includes('seeds')) {
+                    html += `  ${name.padEnd(16)} - <span class="highlight">${item.price}</span> coins  <span class="dim">${item.desc}</span>\n`;
+                }
+            }
+            html += `\n<span class="dim">Use: shop buy [item name]</span>`;
+            html += `\n<span class="dim">Your coins: </span><span class="highlight">${state.coins}</span>`;
+            display(html);
+        }
+
+        function showFarm() {
+            let html = `<span class="section-title">═══ 🌾 YOUR FARM ═══</span>\n\n`;
+
+            // 3x3 grid
+            for (let row = 0; row < 3; row++) {
+                const rowLetter = ['A', 'B', 'C'][row];
+                let rowDisplay = '  ';
+                for (let col = 0; col < 3; col++) {
+                    const idx = row * 3 + col;
+                    const plot = state.farm[idx];
+                    const plotName = `${rowLetter}${col + 1}`;
+
+                    let cell = '[ 🟫 ]';
+                    if (plot) {
+                        const elapsed = (Date.now() - plot.plantedAt) / 1000;
+                        const progress = Math.min(elapsed / plot.growTime, 1);
+                        const crop = state.crops[plot.type];
+
+                        if (progress >= 1) {
+                            cell = `[${crop.emoji}RDY]`;
+                        } else {
+                            const stageIdx = Math.floor(progress * 2);
+                            const remaining = Math.ceil(plot.growTime - elapsed);
+                            cell = `[${crop.stages[stageIdx]}${remaining.toString().padStart(3)}]`;
+                        }
+                    }
+                    rowDisplay += ` ${plotName}${cell}`;
+                }
+                html += rowDisplay + '\n';
             }
 
-            let html = '<div class="typing-section">';
-            html += '<h2 style="margin-bottom:1rem;color:var(--accent-cyan)">⌨️ Type to Earn Coins</h2>';
-            html += '<div class="typing-prompt">';
+            html += `\n<span class="dim">Legend: 🟫=Empty, 🌱=Growing, RDY=Ready to harvest</span>`;
+            html += `\n<span class="dim">Use: farm plant [seed] [plot], farm harvest [plot]</span>`;
+            display(html);
+        }
+
+        function showInventory() {
+            let html = `<span class="section-title">═══ 🎒 INVENTORY ═══</span>\n\n`;
+
+            const items = Object.entries(state.inventory).filter(([k, v]) => v > 0);
+
+            if (items.length === 0) {
+                html += `<span class="dim">Your inventory is empty.</span>\n`;
+                html += `<span class="dim">Buy seeds from the shop to get started!</span>`;
+            } else {
+                for (const [name, count] of items) {
+                    html += `  ${name.padEnd(20)} x${count}\n`;
+                }
+            }
+
+            html += `\n<span class="dim">Use: shop sell [item] [quantity]</span>`;
+            display(html);
+        }
+
+        function showStats() {
+            display(`<span class="section-title">═══ 📊 YOUR STATS ═══</span>
+
+  Level:      <span class="highlight">${state.level}</span>
+  XP:         <span class="highlight">${state.xp}</span> / ${state.level * 100}
+  Coins:      <span class="highlight">${state.coins}</span>
+
+  Keystrokes: ${state.totalKeystrokes}
+  Correct:    ${state.correctKeystrokes}
+  Accuracy:   ${state.totalKeystrokes > 0 ? Math.round((state.correctKeystrokes / state.totalKeystrokes) * 100) : 100}%`);
+        }
+
+        function showTyping() {
+            state.mode = 'typing';
+            state.typingText = state.prompts[Math.floor(Math.random() * state.prompts.length)];
+            state.typingIndex = 0;
+            renderTyping();
+            log('📝 Typing mode started. Type the text! (type "exit" to quit)', 'system');
+        }
+
+        function renderTyping() {
+            let html = `<span class="section-title">═══ ⌨️ TYPING CHALLENGE ═══</span>
+
+<span class="dim">Type the text below. Earn ${state.level} coin(s) per correct character!</span>
+
+<div class="typing-area">`;
 
             for (let i = 0; i < state.typingText.length; i++) {
                 if (i < state.typingIndex) {
@@ -463,272 +430,329 @@
                 }
             }
 
-            html += '</div>';
-            html += `<input type="text" class="typing-input" id="typing-input" placeholder="Start typing here..." autocomplete="off">`;
-            html += '<div class="typing-stats">';
-            html += `<span>Progress: ${state.typingIndex}/${state.typingText.length}</span>`;
-            html += `<span>Coins per char: ${state.level}</span>`;
-            html += '</div>';
-            html += '</div>';
+            html += `</div>
 
-            return html;
-        }
+<span class="dim">Progress: ${state.typingIndex}/${state.typingText.length}</span>
+<span class="dim">Type 'exit' to leave typing mode</span>`;
 
-        function renderShop() {
-            let html = '<div class="npc-dialogue"><div class="npc-name">🧑‍🌾 Farmer Joe</div>';
-            html += '"Welcome to my shop! Type to earn coins, then buy seeds to grow your farm!"</div>';
-            html += '<h2 style="margin-bottom:1rem;color:var(--accent-cyan)">🏪 Shop</h2>';
-            html += `<p style="margin-bottom:1rem;color:var(--text-dim)">Your coins: <span style="color:var(--accent-yellow)">${state.coins}</span></p>`;
-            html += '<div class="shop-grid">';
-
-            for (const item of state.shopItems) {
-                html += `<div class="shop-item" onclick="buyItem('${item.id}')">`;
-                html += `<div class="shop-item-name">${item.name}</div>`;
-                html += `<div class="shop-item-price">💰 ${item.price} coins</div>`;
-                html += `<div class="shop-item-desc">${item.desc}</div>`;
-                html += '</div>';
-            }
-
-            html += '</div>';
-            return html;
-        }
-
-        function renderFarm() {
-            let html = '<h2 style="margin-bottom:1rem;color:var(--accent-cyan)">🌾 Your Farm</h2>';
-            html += '<p style="margin-bottom:1rem;color:var(--text-dim)">Click a plot to plant or harvest.</p>';
-            html += '<div class="farm-grid">';
-
-            for (let i = 0; i < state.farm.length; i++) {
-                const plot = state.farm[i];
-                let plotClass = 'empty';
-                let plotContent = '🟫';
-                let plotStatus = 'Empty';
-
-                if (plot) {
-                    const elapsed = Date.now() - plot.plantedAt;
-                    const growTime = plot.growTime * 1000;
-
-                    if (elapsed >= growTime) {
-                        plotClass = 'ready';
-                        plotContent = plot.harvestEmoji;
-                        plotStatus = 'Ready!';
-                    } else {
-                        plotClass = 'growing';
-                        plotContent = '🌱';
-                        const remaining = Math.ceil((growTime - elapsed) / 1000);
-                        plotStatus = `${remaining}s`;
-                    }
-                }
-
-                html += `<div class="farm-plot ${plotClass}" onclick="interactPlot(${i})">`;
-                html += plotContent;
-                html += `<div class="plot-status">${plotStatus}</div>`;
-                html += '</div>';
-            }
-
-            html += '</div>';
-            return html;
-        }
-
-        function renderInventory() {
-            let html = '<h2 style="margin-bottom:1rem;color:var(--accent-cyan)">🎒 Inventory</h2>';
-
-            const items = Object.entries(state.inventory).filter(([k, v]) => v > 0);
-
-            if (items.length === 0) {
-                html += '<p style="color:var(--text-dim)">Your inventory is empty. Buy some seeds from the shop!</p>';
-            } else {
-                html += '<div class="inventory-grid">';
-                for (const [name, count] of items) {
-                    html += `<div class="inventory-item">${name}: ${count}</div>`;
-                }
-                html += '</div>';
-            }
-
-            return html;
-        }
-
-        function switchView(view) {
-            state.currentView = view;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-view="${view}"]`).classList.add('active');
-            render();
-        }
-
-        function render() {
-            const content = document.getElementById('game-content');
-            switch (state.currentView) {
-                case 'typing': content.innerHTML = renderTyping(); setupTyping(); break;
-                case 'shop': content.innerHTML = renderShop(); break;
-                case 'farm': content.innerHTML = renderFarm(); break;
-                case 'inventory': content.innerHTML = renderInventory(); break;
-            }
-        }
-
-        // ==================== TYPING ====================
-        function setupTyping() {
-            const input = document.getElementById('typing-input');
-            if (!input) return;
-
-            input.focus();
-            input.addEventListener('input', handleTyping);
-        }
-
-        function handleTyping(e) {
-            if (!state.startTime) state.startTime = Date.now();
-
-            const typed = e.target.value;
-            const lastChar = typed[typed.length - 1];
-            const expected = state.typingText[state.typingIndex];
-
-            state.totalKeystrokes++;
-
-            if (lastChar === expected) {
-                state.correctKeystrokes++;
-                state.typingIndex++;
-                addCoins(state.level);
-
-                if (state.typingIndex >= state.typingText.length) {
-                    log(`✅ Completed: "${state.typingText.substring(0, 30)}..."`, 'success');
-                    addCoins(state.level * 10); // Bonus for completion
-                    state.typingText = prompts[Math.floor(Math.random() * prompts.length)];
-                    state.typingIndex = 0;
-                }
-            } else {
-                log(`❌ Typo! Expected '${expected}'`, 'error');
-            }
-
-            e.target.value = '';
-            updateStats();
-            render();
-        }
-
-        // ==================== SHOP ====================
-        function buyItem(itemId) {
-            const item = state.shopItems.find(i => i.id === itemId);
-            if (!item) return;
-
-            if (state.coins < item.price) {
-                log(`❌ Not enough coins! Need ${item.price}, have ${state.coins}`, 'error');
-                return;
-            }
-
-            state.coins -= item.price;
-            state.inventory[item.name] = (state.inventory[item.name] || 0) + 1;
-            log(`🛒 Bought ${item.name} for ${item.price} coins`, 'success');
-            updateStats();
-            saveGame();
-            render();
-        }
-
-        // ==================== FARM ====================
-        const crops = {
-            'Carrot Seeds': { growTime: 30, harvestEmoji: '🥕', sellPrice: 20 },
-            'Tomato Seeds': { growTime: 60, harvestEmoji: '🍅', sellPrice: 50 },
-            'Corn Seeds': { growTime: 90, harvestEmoji: '🌽', sellPrice: 100 },
-            'Golden Seeds': { growTime: 120, harvestEmoji: '✨', sellPrice: 500 }
-        };
-
-        function interactPlot(index) {
-            const plot = state.farm[index];
-
-            if (!plot) {
-                // Plant something
-                const seeds = Object.keys(state.inventory).filter(k => k.includes('Seeds') && state.inventory[k] > 0);
-                if (seeds.length === 0) {
-                    log('❌ No seeds! Buy some from the shop.', 'error');
-                    return;
-                }
-
-                const seed = seeds[0];
-                const cropInfo = crops[seed];
-                state.inventory[seed]--;
-                state.farm[index] = {
-                    type: seed,
-                    plantedAt: Date.now(),
-                    growTime: cropInfo.growTime,
-                    harvestEmoji: cropInfo.harvestEmoji,
-                    sellPrice: cropInfo.sellPrice
-                };
-                log(`🌱 Planted ${seed} in plot ${index + 1}`, 'success');
-            } else {
-                const elapsed = Date.now() - plot.plantedAt;
-                if (elapsed >= plot.growTime * 1000) {
-                    // Harvest
-                    addCoins(plot.sellPrice);
-                    log(`🌾 Harvested ${plot.harvestEmoji} for ${plot.sellPrice} coins!`, 'success');
-                    state.farm[index] = null;
-                } else {
-                    const remaining = Math.ceil((plot.growTime * 1000 - elapsed) / 1000);
-                    log(`⏳ Not ready yet! ${remaining} seconds remaining.`, 'warning');
-                }
-            }
-
-            saveGame();
-            render();
+            display(html);
         }
 
         // ==================== COMMANDS ====================
-        const commands = {
-            help: () => {
-                log('📖 Commands: help, shop, farm, inventory, stats, clear, plant, harvest', 'system');
-            },
-            shop: () => switchView('shop'),
-            farm: () => switchView('farm'),
-            inventory: () => switchView('inventory'),
-            type: () => switchView('typing'),
-            stats: () => {
-                log(`📊 Level: ${state.level} | Coins: ${state.coins} | XP: ${state.xp}`, 'system');
-            },
-            clear: () => {
-                document.getElementById('log').innerHTML = '';
-                log('🧹 Log cleared', 'system');
-            },
-            save: () => {
-                saveGame();
-                log('💾 Game saved!', 'success');
-            }
-        };
+        function handleCommand(input) {
+            const raw = input.trim();
+            const parts = raw.toLowerCase().split(/\s+/);
+            const cmd = parts[0];
 
-        function handleCommand(cmd) {
-            const parts = cmd.toLowerCase().trim().split(' ');
-            const command = parts[0];
-
-            if (commands[command]) {
-                commands[command](parts.slice(1));
-            } else {
-                log(`❓ Unknown command: ${command}. Type 'help' for commands.`, 'warning');
+            // Typing mode
+            if (state.mode === 'typing') {
+                if (raw.toLowerCase() === 'exit') {
+                    state.mode = 'normal';
+                    log('👋 Left typing mode', 'system');
+                    showHelp();
+                    return;
+                }
+                handleTypingInput(raw);
+                return;
             }
+
+            // Normal commands
+            switch (cmd) {
+                case 'help':
+                case '?':
+                    showHelp();
+                    break;
+
+                case 'type':
+                case 'typing':
+                    showTyping();
+                    break;
+
+                case 'shop':
+                    handleShopCommand(parts);
+                    break;
+
+                case 'farm':
+                    handleFarmCommand(parts);
+                    break;
+
+                case 'inventory':
+                case 'inv':
+                case 'i':
+                    showInventory();
+                    break;
+
+                case 'stats':
+                    showStats();
+                    break;
+
+                case 'clear':
+                    document.getElementById('log').innerHTML = '';
+                    log('🧹 Log cleared', 'system');
+                    break;
+
+                case 'save':
+                    save();
+                    log('💾 Game saved!', 'success');
+                    break;
+
+                default:
+                    log(`❓ Unknown command: ${cmd}. Type 'help' for commands.`, 'warning');
+            }
+        }
+
+        function handleShopCommand(parts) {
+            if (parts.length === 1) {
+                showShop();
+                return;
+            }
+
+            const action = parts[1];
+
+            if (action === 'buy') {
+                const itemName = parts.slice(2).join(' ');
+                const item = state.shopItems[itemName];
+
+                if (!item) {
+                    log(`❌ Unknown item: ${itemName}`, 'error');
+                    return;
+                }
+
+                if (state.coins < item.price) {
+                    log(`❌ Not enough coins! Need ${item.price}, have ${state.coins}`, 'error');
+                    return;
+                }
+
+                state.coins -= item.price;
+                state.inventory[itemName] = (state.inventory[itemName] || 0) + 1;
+                log(`✅ Bought ${itemName} for ${item.price} coins`, 'success');
+                updateStats();
+                save();
+                showShop();
+            }
+            else if (action === 'sell') {
+                const qty = parseInt(parts[parts.length - 1]) || 1;
+                const itemName = parts.slice(2, parts.length - (parseInt(parts[parts.length - 1]) ? 1 : 0)).join(' ');
+
+                if (!state.inventory[itemName] || state.inventory[itemName] < qty) {
+                    log(`❌ You don't have ${qty}x ${itemName}`, 'error');
+                    return;
+                }
+
+                // Find sell price
+                let sellPrice = 0;
+                for (const [seedName, crop] of Object.entries(state.crops)) {
+                    if (itemName === crop.emoji || itemName.includes(seedName.replace(' seeds', ''))) {
+                        sellPrice = crop.sellPrice;
+                        break;
+                    }
+                }
+
+                // Check harvested items
+                const harvestPrices = {
+                    'carrot': 25, 'tomato': 50, 'corn': 80, 'pumpkin': 120, 'golden': 400
+                };
+                for (const [name, price] of Object.entries(harvestPrices)) {
+                    if (itemName.includes(name)) {
+                        sellPrice = price;
+                        break;
+                    }
+                }
+
+                if (sellPrice === 0) {
+                    log(`❌ Can't sell ${itemName}`, 'error');
+                    return;
+                }
+
+                state.inventory[itemName] -= qty;
+                const total = sellPrice * qty;
+                addCoins(total);
+                log(`💰 Sold ${qty}x ${itemName} for ${total} coins!`, 'success');
+                showInventory();
+            }
+        }
+
+        function handleFarmCommand(parts) {
+            if (parts.length === 1) {
+                showFarm();
+                return;
+            }
+
+            const action = parts[1];
+
+            if (action === 'plant') {
+                const plotName = parts[parts.length - 1].toUpperCase();
+                const seedName = parts.slice(2, -1).join(' ');
+                const plotIdx = getPlotIndex(plotName);
+
+                if (plotIdx === -1) {
+                    log(`❌ Invalid plot: ${plotName}. Use A1-C3.`, 'error');
+                    return;
+                }
+
+                if (state.farm[plotIdx]) {
+                    log(`❌ Plot ${plotName} is not empty!`, 'error');
+                    return;
+                }
+
+                const fullSeedName = seedName.includes('seeds') ? seedName : seedName + ' seeds';
+
+                if (!state.inventory[fullSeedName] || state.inventory[fullSeedName] < 1) {
+                    log(`❌ No ${fullSeedName} in inventory!`, 'error');
+                    return;
+                }
+
+                if (!state.crops[fullSeedName]) {
+                    log(`❌ Unknown seed type: ${fullSeedName}`, 'error');
+                    return;
+                }
+
+                state.inventory[fullSeedName]--;
+                state.farm[plotIdx] = {
+                    type: fullSeedName,
+                    plantedAt: Date.now(),
+                    growTime: state.crops[fullSeedName].growTime,
+                    watered: false
+                };
+                log(`🌱 Planted ${fullSeedName} in plot ${plotName}!`, 'success');
+                save();
+                showFarm();
+            }
+            else if (action === 'water') {
+                const plotName = parts[2]?.toUpperCase();
+                const plotIdx = getPlotIndex(plotName);
+
+                if (plotIdx === -1) {
+                    log(`❌ Invalid plot: ${plotName}`, 'error');
+                    return;
+                }
+
+                if (!state.farm[plotIdx]) {
+                    log(`❌ Nothing planted in ${plotName}!`, 'error');
+                    return;
+                }
+
+                if (!state.farm[plotIdx].watered) {
+                    state.farm[plotIdx].watered = true;
+                    state.farm[plotIdx].growTime *= 0.8; // 20% faster
+                    log(`💧 Watered plot ${plotName}! Growth speed +20%`, 'success');
+                    save();
+                } else {
+                    log(`💧 Plot ${plotName} already watered!`, 'warning');
+                }
+                showFarm();
+            }
+            else if (action === 'fertilize') {
+                const plotName = parts[2]?.toUpperCase();
+                const plotIdx = getPlotIndex(plotName);
+
+                if (plotIdx === -1) {
+                    log(`❌ Invalid plot: ${plotName}`, 'error');
+                    return;
+                }
+
+                if (!state.farm[plotIdx]) {
+                    log(`❌ Nothing planted in ${plotName}!`, 'error');
+                    return;
+                }
+
+                if (!state.inventory['fertilizer'] || state.inventory['fertilizer'] < 1) {
+                    log(`❌ No fertilizer! Buy from shop.`, 'error');
+                    return;
+                }
+
+                state.inventory['fertilizer']--;
+                const elapsed = (Date.now() - state.farm[plotIdx].plantedAt) / 1000;
+                const remaining = state.farm[plotIdx].growTime - elapsed;
+                state.farm[plotIdx].growTime -= remaining / 2;
+                log(`🧪 Fertilized ${plotName}! Remaining time halved!`, 'success');
+                save();
+                showFarm();
+            }
+            else if (action === 'harvest') {
+                const plotName = parts[2]?.toUpperCase();
+                const plotIdx = getPlotIndex(plotName);
+
+                if (plotIdx === -1) {
+                    log(`❌ Invalid plot: ${plotName}`, 'error');
+                    return;
+                }
+
+                if (!state.farm[plotIdx]) {
+                    log(`❌ Nothing to harvest in ${plotName}!`, 'error');
+                    return;
+                }
+
+                const plot = state.farm[plotIdx];
+                const elapsed = (Date.now() - plot.plantedAt) / 1000;
+
+                if (elapsed < plot.growTime) {
+                    const remaining = Math.ceil(plot.growTime - elapsed);
+                    log(`❌ Not ready! ${remaining}s remaining.`, 'error');
+                    return;
+                }
+
+                const crop = state.crops[plot.type];
+                const cropName = plot.type.replace(' seeds', '');
+                state.inventory[cropName] = (state.inventory[cropName] || 0) + 1;
+                state.farm[plotIdx] = null;
+                log(`🌾 Harvested ${crop.emoji} ${cropName} from ${plotName}!`, 'success');
+                log(`💡 Use 'shop sell ${cropName} 1' to sell for ${crop.sellPrice} coins`, 'system');
+                save();
+                showFarm();
+            }
+        }
+
+        function handleTypingInput(input) {
+            if (!state.startTime) state.startTime = Date.now();
+
+            for (const char of input) {
+                if (state.typingIndex >= state.typingText.length) break;
+
+                state.totalKeystrokes++;
+                const expected = state.typingText[state.typingIndex];
+
+                if (char === expected) {
+                    state.correctKeystrokes++;
+                    state.typingIndex++;
+                    addCoins(state.level);
+                }
+            }
+
+            if (state.typingIndex >= state.typingText.length) {
+                log(`✅ Completed! Bonus: +${state.level * 10} coins!`, 'success');
+                addCoins(state.level * 10);
+                state.typingText = state.prompts[Math.floor(Math.random() * state.prompts.length)];
+                state.typingIndex = 0;
+            }
+
+            updateStats();
+            renderTyping();
         }
 
         // ==================== INIT ====================
         function init() {
-            loadGame();
+            load();
             updateStats();
-            render();
 
-            // Tab switching
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => switchView(tab.dataset.view));
-            });
-
-            // Command input
-            document.getElementById('command-input').addEventListener('keypress', (e) => {
+            document.getElementById('input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && e.target.value.trim()) {
                     handleCommand(e.target.value);
                     e.target.value = '';
                 }
             });
 
-            // Auto-update farm
+            // Auto-refresh farm view
             setInterval(() => {
-                if (state.currentView === 'farm') render();
+                const display = document.getElementById('display');
+                if (display.innerHTML.includes('YOUR FARM')) {
+                    showFarm();
+                }
             }, 1000);
 
-            // Welcome message
             log('🌱 Welcome to TypeFarm!', 'success');
-            log('Type to earn coins, buy seeds, grow crops!', 'system');
-            log("Type 'help' for commands.", 'system');
+            log("Type 'help' to see commands", 'system');
+            showHelp();
         }
 
         init();
